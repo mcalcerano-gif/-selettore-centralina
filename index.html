@@ -1,1 +1,454 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10263f">
+  <title>Selettore Centralina</title>
+  <style>
 
+:root{
+  --navy:#10263f;
+  --navy-2:#173a5e;
+  --blue:#1f6feb;
+  --cyan:#e8f2ff;
+  --bg:#f3f6f9;
+  --card:#ffffff;
+  --text:#15202b;
+  --muted:#667484;
+  --line:#dce3ea;
+  --green:#127a4a;
+  --green-bg:#e8f7ef;
+  --red:#b42318;
+  --red-bg:#ffebe9;
+  --amber:#9a6700;
+  --amber-bg:#fff4ce;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text)}
+.topbar{
+  padding:calc(22px + env(safe-area-inset-top)) 20px 22px;
+  background:linear-gradient(135deg,var(--navy),var(--navy-2));
+  color:#fff;display:flex;justify-content:space-between;align-items:flex-start;gap:16px
+}
+.topbar h1{margin:4px 0 3px;font-size:28px;line-height:1.05}
+.topbar p{margin:0;color:#d9e5f2;font-size:14px}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;opacity:.78}
+main{max-width:980px;margin:0 auto;padding:16px 14px 40px}
+.panel,.results{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 5px 18px rgba(15,35,55,.045)}
+.section-head,.results-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.section-head>div,.results-title>div{display:flex;align-items:center;gap:10px}
+.section-head h2,.results-title h2{font-size:18px;margin:0}
+.results-title>div:first-child{display:block}
+.results-title .eyebrow{color:var(--muted)}
+.step{width:28px;height:28px;border-radius:9px;background:var(--cyan);color:var(--blue);display:grid;place-items:center;font-size:13px;font-weight:800}
+.badge{font-size:11px;background:#edf2f7;border:1px solid var(--line);padding:6px 9px;border-radius:999px;color:var(--muted);font-weight:700}
+.grid{display:grid;gap:13px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+label{font-size:13px;font-weight:700;color:#334155}
+label>span{float:right;color:var(--muted);font-weight:600}
+label small{display:block;margin-top:5px;color:var(--muted);font-weight:500}
+input,select{
+  width:100%;margin-top:7px;padding:13px 12px;border:1px solid #cfd8e3;border-radius:11px;
+  font:inherit;font-size:16px;color:var(--text);background:#fff;outline:none
+}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(31,111,235,.13)}
+.segmented{display:grid;grid-template-columns:1fr 1fr;background:#edf2f6;padding:4px;border-radius:12px;margin-bottom:16px}
+.segment{border:0;padding:11px;border-radius:9px;background:transparent;font-weight:800;color:var(--muted)}
+.segment.active{background:#fff;color:var(--navy);box-shadow:0 2px 7px rgba(20,35,50,.1)}
+.ghost{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;border-radius:10px;padding:9px 12px;font-weight:700}
+.notice{background:var(--amber-bg);color:#6f4d00;border-radius:10px;padding:11px 12px;margin-top:13px;font-size:12px;line-height:1.4}
+.hidden{display:none!important}
+.results{background:linear-gradient(180deg,#fff,#f8fbff);border-color:#bfd6f6}
+.status{font-size:12px;font-weight:900;padding:8px 10px;border-radius:999px}
+.status.ok{color:var(--green);background:var(--green-bg)}
+.status.no{color:var(--red);background:var(--red-bg)}
+.hero-results{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.hero-results article{padding:14px;border-radius:14px;background:var(--navy);color:#fff;min-width:0}
+.hero-results span{display:block;font-size:11px;line-height:1.25;color:#c7d7e8;min-height:28px}
+.hero-results strong{display:inline-block;font-size:25px;margin-top:7px;line-height:1}
+.hero-results small{font-size:11px;color:#c7d7e8;margin-left:3px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.checks article{display:flex;justify-content:space-between;align-items:center;padding:12px 13px;border:1px solid var(--line);background:#fff;border-radius:13px}
+.checks span,.oil-grid span,.details-grid span{font-size:11px;color:var(--muted);display:block;margin-bottom:3px}
+.checks strong{font-size:16px}
+.pill{font-size:11px;border-radius:999px;padding:5px 8px;background:#eef2f5;color:var(--muted)}
+.pill.ok{background:var(--green-bg);color:var(--green)}
+.pill.no{background:var(--red-bg);color:var(--red)}
+.pill.neutral{background:#edf3ff;color:var(--blue)}
+.oil-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.oil-grid>div{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fafcfe}
+.oil-grid strong{font-size:18px}
+.oil-grid .tank{background:var(--cyan);border-color:#c9ddfa}
+.details summary{cursor:pointer;font-weight:800}
+.details-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px}
+.details-grid>div{padding:10px;background:#f7f9fb;border-radius:10px}
+footer{text-align:center;color:var(--muted);font-size:11px;line-height:1.45;padding:8px 20px}
+
+.fixed-type{display:inline-flex;align-items:center;padding:10px 14px;margin-bottom:16px;border-radius:11px;background:var(--cyan);color:var(--navy);font-weight:900;border:1px solid #c9ddfa}
+.calculate-btn{width:100%;margin-top:16px;padding:15px 16px;border:0;border-radius:12px;background:var(--blue);color:#fff;font-size:16px;font-weight:900;letter-spacing:.03em;box-shadow:0 6px 16px rgba(31,111,235,.25)}
+.calculate-btn:active{transform:translateY(1px)}
+.live-note{text-align:center;color:var(--muted);font-size:11px;margin:8px 0 0}
+
+@media(max-width:720px){
+  .hero-results{grid-template-columns:1fr 1fr}
+  .oil-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:520px){
+  .topbar h1{font-size:24px}
+  .grid.two,.checks,.details-grid{grid-template-columns:1fr}
+  .hero-results{grid-template-columns:1fr 1fr}
+  .hero-results strong{font-size:22px}
+  .oil-grid{grid-template-columns:1fr 1fr}
+  .results-title{align-items:flex-start}
+}
+
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">OMARLIFT · PROTOTIPO V1</div>
+      <h1>Selettore centralina</h1>
+      <p>Calcolo preliminare da dati impianto e cilindro.</p>
+    </div>
+    <button id="resetBtn" class="ghost">Azzera</button>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <span class="step">1</span>
+          <h2>Configurazione</h2>
+        </div>
+      </div>
+
+      <div class="fixed-type">Cilindro C97</div>
+
+      <div class="grid two">
+        <label>
+          Azionamento
+          <input id="ratio" type="number" step="1" min="1" value="2">
+          <small>Rapporto, es. 2:1</small>
+        </label>
+        <label>
+          Numero cilindri
+          <input id="cylinders" type="number" step="1" min="1" value="1">
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <span class="step">2</span>
+          <h2>Dati impianto</h2>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <label>Portata nominale <span>kg</span>
+          <input id="payload" type="number" step="1" value="400">
+        </label>
+        <label>Cabina + arcata <span>kg</span>
+          <input id="carWeight" type="number" step="1" value="400">
+        </label>
+        <label>Puleggia + funi <span>kg</span>
+          <input id="ropeWeight" type="number" step="1" value="120">
+        </label>
+        <label>Velocità cabina <span>m/s</span>
+          <input id="speed" type="number" step="0.01" value="0.30">
+        </label>
+        <label>Corsa cabina <span>mm</span>
+          <input id="travel" type="number" step="1" value="7000">
+        </label>
+        <label>Extra corsa <span>mm</span>
+          <input id="extraTravel" type="number" step="1" value="300">
+        </label>
+        <label>Distanza stelo–puleggia <span>mm</span>
+          <input id="rodPulleyDistance" type="number" step="1" value="350">
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <span class="step">3</span>
+          <h2>Cilindro</h2>
+        </div>
+        <span class="badge">Inserimento manuale</span>
+      </div>
+
+      <div class="grid two">
+        <label>Diametro esterno <span>mm</span>
+          <input id="diameter" type="number" step="1" value="90">
+        </label>
+        <label id="thicknessWrap">Spessore <span>mm</span>
+          <input id="thickness" type="number" step="0.1" value="5">
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <span class="step">4</span>
+          <h2>Pompa selezionata</h2>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <label>Portata pompa <span>L/min</span>
+          <input id="selectedPump" type="number" step="1" value="55">
+        </label>
+        <label>Margine potenza
+          <select id="motorMargin">
+            <option value="1">Nessun margine</option>
+            <option value="1.1" selected>+10%</option>
+            <option value="1.15">+15%</option>
+            <option value="1.2">+20%</option>
+          </select>
+        </label>
+      </div>
+      <button id="calculateBtn" class="calculate-btn" type="button">CALCOLA CENTRALINA</button>
+      <p class="live-note">I risultati si aggiornano anche automaticamente mentre modifichi i dati.</p>
+    </section>
+
+    <section class="results">
+      <div class="results-title">
+        <div>
+          <div class="eyebrow">RISULTATI IN TEMPO REALE</div>
+          <h2>Centralina richiesta</h2>
+        </div>
+        <div id="overallStatus" class="status ok">VERIFICA OK</div>
+      </div>
+
+      <div class="hero-results">
+        <article>
+          <span>Pompa necessaria</span>
+          <strong id="requiredFlow">—</strong>
+          <small>L/min</small>
+        </article>
+        <article>
+          <span>Potenza teorica</span>
+          <strong id="theoreticalPower">—</strong>
+          <small>kW</small>
+        </article>
+        <article>
+          <span>Potenza con pompa scelta</span>
+          <strong id="selectedPower">—</strong>
+          <small>kW</small>
+        </article>
+        <article>
+          <span>Motore suggerito</span>
+          <strong id="recommendedMotor">—</strong>
+          <small>kW</small>
+        </article>
+      </div>
+
+      <div class="checks">
+        <article>
+          <div>
+            <span>Pressione minima</span>
+            <strong id="minPressure">— bar</strong>
+          </div>
+          <b id="minPressureStatus" class="pill">—</b>
+        </article>
+        <article>
+          <div>
+            <span>Pressione massima</span>
+            <strong id="maxPressure">— bar</strong>
+          </div>
+          <b id="maxPressureStatus" class="pill">—</b>
+        </article>
+        <article>
+          <div>
+            <span>Grado di sicurezza</span>
+            <strong id="safetyFactor">—</strong>
+          </div>
+          <b id="safetyStatus" class="pill">—</b>
+        </article>
+        <article>
+          <div>
+            <span>Velocità reale</span>
+            <strong id="actualSpeed">— m/s</strong>
+          </div>
+          <b id="speedStatus" class="pill neutral">INFO</b>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <span class="step">5</span>
+          <h2>Olio e serbatoio</h2>
+        </div>
+      </div>
+      <div class="oil-grid">
+        <div><span>Riempimento</span><strong id="fillOil">— L</strong></div>
+        <div><span>Movimento</span><strong id="movementOil">— L</strong></div>
+        <div><span>Totale necessario</span><strong id="totalOil">— L</strong></div>
+        <div class="tank"><span>Serbatoio minimo indicativo</span><strong id="tankSuggestion">—</strong></div>
+      </div>
+    </section>
+
+    <section class="panel details">
+      <details>
+        <summary>Mostra dettagli di calcolo</summary>
+        <div class="details-grid">
+          <div><span>Lunghezza cilindro</span><strong id="cylinderLength">— mm</strong></div>
+          <div><span>Area stelo</span><strong id="rodArea">— mm²</strong></div>
+          <div><span>Peso stelo</span><strong id="rodWeight">— N</strong></div>
+          <div><span>Momento d'inerzia</span><strong id="inertia">— mm⁴</strong></div>
+          <div><span>Carico totale calcolato</span><strong id="totalLoad">— N</strong></div>
+          <div><span>Potenza teorica</span><strong id="theoreticalHp">— HP</strong></div>
+        </div>
+      </details>
+    </section>
+
+    <footer>
+      Prototipo tecnico iniziale. I risultati devono essere verificati prima dell’utilizzo commerciale o esecutivo.
+    </footer>
+  </main>
+
+  <script>
+const PI = 3.1415;
+const E = 206010;
+
+const c97 = {
+  50:[2,3.1],60:[3,4.5],70:[3.8,5],80:[5,3.8],85:[5.7,4.7],
+  90:[6.4,5.7],100:[7.8,5.6],110:[9.5,6.4],120:[11.3,6.1],
+  130:[13.3,8.5],150:[17.7,8.3],180:[25.4,15.6],200:[31.4,18.9],230:[41.5,19.4]
+};
+const tanks = [
+  {name:"40", useful:18, min:21},{name:"50/S", useful:23, min:20},{name:"60/S", useful:34, min:31},
+  {name:"110/S", useful:65, min:36.5},{name:"135/S", useful:100, min:36.5},{name:"210/S", useful:140, min:51.5},
+  {name:"320/S", useful:215, min:90},{name:"450", useful:300, min:130},{name:"680", useful:475, min:175},
+  {name:"900", useful:675, min:175},{name:"1000", useful:775, min:175},{name:"1300", useful:1075, min:175}
+];
+const motorSizes=[2.2,3,4,5.5,7.5,9.2,11,15,18.5,22,30,37,45,55,75,90,110];
+
+function byId(id){ return document.getElementById(id); }
+function num(id){
+  const raw=String(byId(id).value || '').replace(',', '.');
+  const value=parseFloat(raw);
+  return Number.isFinite(value) ? value : 0;
+}
+function fmt(n,d){
+  d = typeof d === 'number' ? d : 2;
+  return Number.isFinite(n) ? n.toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d}) : '—';
+}
+function nearestLookup(table,d){
+  const keys=Object.keys(table).map(Number).sort(function(a,b){return a-b;});
+  if(table[d]) return {key:d,value:table[d],exact:true};
+  let best=keys[0];
+  keys.forEach(function(k){ if(Math.abs(k-d)<Math.abs(best-d)) best=k; });
+  return {key:best,value:table[best],exact:false};
+}
+function recommendedMotor(kw){
+  for(let i=0;i<motorSizes.length;i++){ if(motorSizes[i]>=kw) return motorSizes[i]; }
+  return Math.ceil(kw/5)*5;
+}
+function setStatus(id,ok,text){
+  const el=byId(id);
+  el.textContent=text || (ok?'OK':'NO');
+  el.className='pill '+(ok?'ok':'no');
+}
+
+function calculate(){
+  const ratio=num('ratio');
+  const cylinders=num('cylinders');
+  const payload=num('payload');
+  const car=num('carWeight');
+  const ropes=num('ropeWeight');
+  const speed=num('speed');
+  const travel=num('travel');
+  const extra=num('extraTravel');
+  const distance=num('rodPulleyDistance');
+  const diameter=num('diameter');
+  const thickness=num('thickness');
+  const pump=num('selectedPump');
+  const margin=num('motorMargin');
+
+  if(ratio<=0 || cylinders<=0 || diameter<=0 || speed<0){
+    byId('overallStatus').textContent='DATI NON VALIDI';
+    byId('overallStatus').className='status no';
+    return;
+  }
+
+  const cylinderLength=(travel+extra)/ratio;
+  const oil=nearestLookup(c97,diameter);
+  const movementPerM=oil.value[0];
+  const fillPerM=oil.value[1];
+  const requiredFlow=movementPerM*speed*60/ratio*cylinders;
+  const movementOil=(cylinderLength/1000)*movementPerM;
+  const fillOil=(cylinderLength/1000)*fillPerM;
+  const totalOil=movementOil+fillOil;
+  const actualSpeed=requiredFlow>0 ? pump*speed/requiredFlow : 0;
+
+  const innerDiameter=Math.max(0,diameter-(2*thickness));
+  const rodArea=Math.pow(diameter/2,2)*PI;
+  const rodWeight=9.81*(((diameter*diameter-innerDiameter*innerDiameter)/4*PI)/1000000*cylinderLength*7.86);
+  const inertia=(PI/64)*(Math.pow(diameter,4)-Math.pow(innerDiameter,4));
+  const totalLoad=(rodWeight*.64)+9.81*(ratio*((payload+car)/cylinders)+ropes);
+  const minPressure=(9.81*((car/cylinders)*ratio+ropes)+rodWeight)*10/rodArea;
+  const maxPressure=(9.81*(((car+payload)/cylinders)*ratio+ropes)+rodWeight)/rodArea*10;
+  const safetyFactor=(PI*PI*E*inertia)/Math.pow(cylinderLength+distance,2)/totalLoad;
+  const theoreticalPower=requiredFlow*maxPressure/459;
+  const selectedPower=pump*maxPressure/459;
+  const suggested=recommendedMotor(selectedPower*margin);
+
+  byId('requiredFlow').textContent=fmt(requiredFlow,1);
+  byId('theoreticalPower').textContent=fmt(theoreticalPower,2);
+  byId('selectedPower').textContent=fmt(selectedPower,2);
+  byId('recommendedMotor').textContent=fmt(suggested,1);
+  byId('minPressure').textContent=fmt(minPressure,2)+' bar';
+  byId('maxPressure').textContent=fmt(maxPressure,2)+' bar';
+  byId('actualSpeed').textContent=fmt(actualSpeed,3)+' m/s';
+  byId('fillOil').textContent=fmt(fillOil,2)+' L';
+  byId('movementOil').textContent=fmt(movementOil,2)+' L';
+  byId('totalOil').textContent=fmt(totalOil,2)+' L';
+  byId('cylinderLength').textContent=fmt(cylinderLength,0)+' mm';
+  byId('rodArea').textContent=fmt(rodArea,1)+' mm²';
+  byId('rodWeight').textContent=fmt(rodWeight,1)+' N';
+  byId('inertia').textContent=fmt(inertia,0)+' mm⁴';
+  byId('totalLoad').textContent=fmt(totalLoad,1)+' N';
+  byId('theoreticalHp').textContent=fmt(theoreticalPower*1.36,2)+' HP';
+  byId('safetyFactor').textContent=fmt(safetyFactor,2);
+
+  const minOk=minPressure>=12;
+  const maxOk=maxPressure<=45;
+  const safetyOk=safetyFactor>=2.8;
+  const flowOk=pump>=requiredFlow;
+  setStatus('minPressureStatus',minOk);
+  setStatus('maxPressureStatus',maxOk);
+  setStatus('safetyStatus',safetyOk);
+
+  const tank=tanks.find(function(t){return t.useful>=totalOil;});
+  byId('tankSuggestion').textContent=tank ? tank.name+' L' : '> 1300 L';
+
+  const allOk=minOk && maxOk && safetyOk && flowOk;
+  byId('overallStatus').textContent=allOk?'VERIFICA OK':'DA VERIFICARE';
+  byId('overallStatus').className='status '+(allOk?'ok':'no');
+  byId('requiredFlow').title=oil.exact?'':'Diametro non presente in tabella: usato '+oil.key+' mm';
+}
+
+function bind(){
+  document.querySelectorAll('input,select').forEach(function(el){
+    el.addEventListener('input',calculate);
+    el.addEventListener('change',calculate);
+  });
+  byId('calculateBtn').addEventListener('click',calculate);
+  byId('resetBtn').addEventListener('click',function(){ window.location.reload(); });
+  calculate();
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
+else bind();
+</script>
+</body>
+</html>
